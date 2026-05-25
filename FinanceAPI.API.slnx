@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FinanceAPI.API/FinanceAPI.API.csproj" />
+  <Project Path="FinanceAPI.Domain/FinanceAPI.Domain.csproj" />
+</Solution>
