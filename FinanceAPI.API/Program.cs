@@ -45,8 +45,21 @@ builder.Services.AddControllers();
 // Swagger nativo .NET 10
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
+app.UseCors("AllowReact"); // ← deve vir ANTES do UseAuthentication
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.UseMiddleware<ExceptionMiddleware>();
