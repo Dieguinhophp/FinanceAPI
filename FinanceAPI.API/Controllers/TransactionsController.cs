@@ -37,10 +37,11 @@ public class TransactionsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateTransactionDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateTransactionDto dto)
     {
-        var result = await _transactionService.CreateAsync(GetUserId(), dto);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var result = await _transactionService.CreateAsync(userId, dto);
+        return Ok(result);
     }
 
     [HttpPut("{id}")]

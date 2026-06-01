@@ -44,29 +44,41 @@ public class TransactionService : ITransactionService
         };
     }
 
-    public async Task<TransactionResponseDto> CreateAsync(int userId, CreateTransactionDto dto)
+    public async Task<IEnumerable<TransactionResponseDto>> CreateAsync(int userId, CreateTransactionDto dto)
     {
-        var transaction = new Transaction
-        {
-            Description = dto.Description,
-            Amount = dto.Amount,
-            Type = dto.Type,
-            Date = dto.Date,
-            CategoryId = dto.CategoryId,
-            UserId = userId
-        };
+        var installments = dto.Installments < 1 ? 1 : dto.Installments;
+        var results = new List<TransactionResponseDto>();
 
-        var created = await _repository.CreateAsync(transaction);
-
-        return new TransactionResponseDto
+        for (int i = 0; i < installments; i++)
         {
-            Id = created.Id,
-            Description = created.Description,
-            Amount = created.Amount,
-            Type = created.Type,
-            Date = created.Date,
-            CategoryName = created.Category?.Name ?? string.Empty
-        };
+            var description = installments > 1
+                ? $"{dto.Description} ({i + 1}/{installments})"
+                : dto.Description;
+
+            var transaction = new Transaction
+            {
+                Description = description,
+                Amount = dto.Amount,
+                Type = dto.Type,
+                Date = dto.Date.AddMonths(i), // ← incrementa o mês a cada parcela
+                CategoryId = dto.CategoryId,
+                UserId = userId
+            };
+
+            var created = await _repository.CreateAsync(transaction);
+
+            results.Add(new TransactionResponseDto
+            {
+                Id = created.Id,
+                Description = created.Description,
+                Amount = created.Amount,
+                Type = created.Type,
+                Date = created.Date,
+                CategoryName = created.Category?.Name ?? string.Empty
+            });
+        }
+
+        return results;
     }
 
     public async Task<TransactionResponseDto> UpdateAsync(int id, CreateTransactionDto dto)

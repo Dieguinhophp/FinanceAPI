@@ -9,4 +9,5 @@ public class CreateTransactionDto
     public TransactionType Type { get; set; }
     public DateTime Date { get; set; }
     public int CategoryId { get; set; }
+    public int Installments { get; set; } = 1;
 }
